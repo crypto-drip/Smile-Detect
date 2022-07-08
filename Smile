@@ -1,0 +1,51 @@
+import cv2 as cv
+import sys
+import numpy as np
+import time
+BLUE = [255,0,0]
+
+
+video_capture=cv.VideoCapture(0)
+eye_cascade=cv.CascadeClassifier('righteye.xml')
+face_cascade=cv.CascadeClassifier('facedet.xml')
+smile_cascade=cv.CascadeClassifier('smile.xml')
+img = cv.imread("man.png")
+if img is None:
+    sys.exit("Could not read the image.")
+grey =cv.cvtColor(img,cv.COLOR_BGR2GRAY)
+x=0
+while True:
+
+    _,frame = video_capture.read()
+    grey =cv.cvtColor(frame,cv.COLOR_BGR2GRAY)
+
+    faces=face_cascade.detectMultiScale(grey, 1.1, 4)
+    smiles = smile_cascade.detectMultiScale(grey, 1.8, 20)
+    try: 
+        print(smiles[3])
+        x+=1
+
+    except:
+        pass
+    if x !=0:
+        print("smile")
+        x=0
+        
+    lap1=cv.Laplacian(frame,cv.CV_64F)
+
+    lap=np.uint8(lap1)
+    
+
+    for (x, y, w, h) in smiles:
+        cv.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+
+    
+
+    edgeShow=cv.Canny(frame,100,100)
+    cv.imshow("edge", edgeShow)
+    cv.imshow("face", frame)
+
+    if cv.waitKey(5)==ord('x'):
+        break
+
+
